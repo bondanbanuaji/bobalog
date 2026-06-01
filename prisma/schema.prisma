@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Product {
+  id              String        @id @default(cuid())
+  userId          String
+
+  // Source
+  shopeeUrl       String
+  shopeeProductId String?
+
+  // Core Data
+  title           String
+  thumbnail       String?
+  gallery         String[]
+  price           Int           // dalam rupiah
+  originalPrice   Int?
+  discountPercent Int?
+
+  // Shop Info
+  shopName        String?
+  shopUrl         String?
+
+  // Product Stats
+  rating          Float?
+  soldCount       Int?
+  stock           Int?
+  variations      Json?         // detail pilihan variasi
+
+  // User Notes
+  notes           String?
+  priority        Priority      @default(NORMAL)
+  status          ProductStatus @default(ACTIVE)
+
+  // Scrape State
+  scrapeStatus    ScrapeStatus  @default(PENDING)
+  lastScraped     DateTime?
+
+  // Relations
+  priceHistory    PriceHistory[]
+  collections     CollectionProduct[]
+  tags            ProductTag[]
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([userId])
+  @@index([shopeeUrl])
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  price     Int
+  checkedAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Collection {
+  id          String              @id @default(cuid())
+  userId      String
+
+  name        String
+  description String?
+  emoji       String?             // "🎮", "💻", "👟", "🧴", "💸"
+  color       String?             // Hex color untuk card accent
+  isPublic    Boolean             @default(false)
+  shareToken  String?             @unique @default(cuid())
+  sortOrder   Int                 @default(0)
+
+  products    CollectionProduct[]
+
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([shareToken])
+}
+
+model CollectionProduct {
+  id           String     @id @default(cuid())
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  productId    String
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sortOrder    Int        @default(0)
+  addedAt      DateTime   @default(now())
+
+  @@unique([collectionId, productId])
+}
+
+model Tag {
+  id       String       @id @default(cuid())
+  userId   String
+  name     String
+  color    String?
+
+  products ProductTag[]
+
+  @@unique([userId, name])
+}
+
+model ProductTag {
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tagId     String
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([productId, tagId])
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+  MUST_BUY
+}
+
+enum ProductStatus {
+  ACTIVE
+  ARCHIVED
+  BOUGHT
+  UNAVAILABLE
+}
+
+enum ScrapeStatus {
+  PENDING
+  PREVIEW
+  BASIC
+  FULL
+  FAILED
+}
