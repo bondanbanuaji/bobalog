@@ -89,16 +89,6 @@
   --color-text-accent: var(--accent);
 }
 
-/* View Transition circular reveal styling */
-::view-transition-active(root) {
-  pointer-events: none;
-}
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
-}
-
 
 /* ---- Base Resets ---- */
 * {
@@ -498,4 +488,12 @@ html.light .sidebar-link.active {
 .hide-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* ---- Clerk Watermark & Dev Mode Badge Hiding ---- */
+[data-clerk-badge], 
+.cl-internal-b3fm6y, 
+.cl-internal-1pybe25,
+.cl-internal-b3fm6y * { 
+  display: none !important; 
 }

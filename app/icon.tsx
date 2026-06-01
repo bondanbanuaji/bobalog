@@ -9,8 +9,19 @@ export function generateImageMetadata() {
   ]
 }
 
-export default function Icon({ id }: { id: string }) {
-  const size = parseInt(id)
+export default async function Icon(props: any) {
+  let id = props?.id
+  if (!id && props?.params) {
+    try {
+      const resolvedParams = typeof props.params.then === 'function' || props.params instanceof Promise 
+        ? await props.params 
+        : props.params
+      id = resolvedParams?.id
+    } catch (e) {}
+  }
+
+  const parsedSize = id ? parseInt(id) : NaN
+  const size = isNaN(parsedSize) ? 32 : parsedSize
 
   return new ImageResponse(
     (

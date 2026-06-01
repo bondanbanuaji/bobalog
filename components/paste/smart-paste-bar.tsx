@@ -76,7 +76,7 @@ export default function SmartPasteBar() {
             Masuk untuk mulai menyimpan produk...
           </div>
         </div>
-        <SignInButton mode="modal">
+        <SignInButton>
           <button className="btn-primary px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm rounded-xl flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             <LogIn size={14} className="sm:w-4 sm:h-4" />
             <span className="hidden xs:inline sm:inline">Masuk</span>

@@ -38,7 +38,12 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${outfit.variable} ${dmSans.variable}`} suppressHydrationWarning>
       <body className="noise-overlay">
-        <ClerkProvider>
+        <ClerkProvider
+          signInUrl="/sign-in"
+          signUpUrl="/sign-up"
+          signInFallbackRedirectUrl="/"
+          signUpFallbackRedirectUrl="/"
+        >
           <ThemeProvider>
             {/* Floating Boba Pearls Background */}
             <div className="boba-bg" aria-hidden="true">

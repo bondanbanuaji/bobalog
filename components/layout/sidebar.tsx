@@ -149,13 +149,13 @@ export default function Sidebar() {
           {/* User Logged Out */}
           <Show when="signed-out">
             <div className={cn('flex flex-col gap-2', !sidebarOpen && 'items-center')}>
-              <SignInButton mode="modal">
+              <SignInButton>
                 <button className={cn('btn-primary text-xs py-2', sidebarOpen ? 'w-full' : 'px-2 w-8 h-8 flex items-center justify-center rounded-full')}>
                   {sidebarOpen ? 'Masuk' : '→'}
                 </button>
               </SignInButton>
               {sidebarOpen && (
-                <SignUpButton mode="modal">
+                <SignUpButton>
                   <button className="btn-ghost w-full text-xs py-1.5 border border-[var(--color-glass-border)] rounded-xl">
                     Daftar
                   </button>
