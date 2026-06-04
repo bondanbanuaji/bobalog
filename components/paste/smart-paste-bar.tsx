@@ -153,7 +153,6 @@ export default function SmartPasteBar() {
         className="btn-primary px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm rounded-xl disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:transform-none disabled:hover:shadow-none flex-shrink-0"
       >
         <Plus size={14} className="sm:w-4 sm:h-4" />
-        <span className="hidden sm:inline">Tambah</span>
       </button>
     </div>
   )

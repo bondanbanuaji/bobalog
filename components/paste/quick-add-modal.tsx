@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, Link2, Info, Loader2 } from 'lucide-react'
+import { motion, AnimatePresence, Variants } from 'framer-motion'
+import { X, Link2, Info, Loader2, Package } from 'lucide-react'
 import { useUIStore } from '@/store/ui.store'
 import { extractShopeeProductId } from '@/lib/utils'
 import { saveProduct } from '@/actions/product.actions'
@@ -10,30 +10,34 @@ import { toast } from 'sonner'
 
 export default function QuickAddModal() {
   const { quickAddModalOpen, setQuickAddModalOpen, pastedUrl, setPastedUrl, addProduct } = useUIStore()
-  
+
   const [title, setTitle] = useState('')
   const [price, setPrice] = useState('')
   const [notes, setNotes] = useState('')
+  const [urlInput, setUrlInput] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  useEffect(() => {
+    if (quickAddModalOpen) {
+      setUrlInput(pastedUrl || '')
+    }
+  }, [quickAddModalOpen, pastedUrl])
 
-
-  // Extract ID
-  const productId = pastedUrl ? extractShopeeProductId(pastedUrl) : null
+  const productId = urlInput ? extractShopeeProductId(urlInput) : null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    
+
     try {
       const result = await saveProduct({
         title,
         price: Number(price),
         notes,
-        shopeeUrl: pastedUrl || '',
+        shopeeUrl: urlInput || '',
         shopeeProductId: productId || undefined
       })
-      
+
       if (result.success && result.product) {
         addProduct(result.product)
         toast.success('Produk berhasil ditambahkan ke katalog')
@@ -53,129 +57,238 @@ export default function QuickAddModal() {
     setQuickAddModalOpen(false)
     setTimeout(() => {
       setPastedUrl(null)
+      setUrlInput('')
       setTitle('')
       setPrice('')
       setNotes('')
-    }, 300) // Clear after exit animation
+    }, 300)
   }
 
-  if (!quickAddModalOpen) return null
+  const fieldVariants: Variants = {
+    hidden: { opacity: 0, y: 8 },
+    visible: (i: number) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.06, duration: 0.28, ease: [0.22, 1, 0.36, 1] as const }
+    })
+  }
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          onClick={closeModal}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        />
+      {quickAddModalOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={closeModal}
+            className="absolute inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm"
+          />
 
-        {/* Modal */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: 10 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          className="relative w-full max-w-md glass-card bg-bg-surface overflow-hidden shadow-2xl"
-        >
-          {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--color-glass-border)]">
-            <h2 className="text-lg font-medium text-text-primary flex items-center gap-2">
-              <span>Tambahkan Produk</span>
-              <span className="badge bg-boba/10 text-boba ml-1">Manual</span>
-            </h2>
-            <button 
-              onClick={closeModal}
-              className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-[var(--color-glass-bg-hover)] transition-colors"
-            >
-              <X size={18} />
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="p-5 space-y-5">
-            {/* Info Box */}
-            <div className="flex gap-3 p-3 rounded-xl bg-boba/10 border border-boba/20 text-sm text-text-primary">
-              <Info size={18} className="text-boba flex-shrink-0 mt-0.5" />
-              <p>Shopee melarang scraping otomatis. Silakan isi Nama & Harga secara manual untuk menyimpannya ke Bobalog.</p>
-            </div>
-
-            {/* URL Display */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-text-secondary ml-1">URL Shopee</label>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-muted">
-                <Link2 size={14} className="flex-shrink-0" />
-                <span className="truncate">{pastedUrl || 'Tidak ada URL'}</span>
+          {/* Modal — putih solid di light, hitam solid di dark */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            transition={{ type: 'spring', stiffness: 340, damping: 28 }}
+            className="relative w-full max-w-md overflow-hidden rounded-2xl shadow-2xl
+              bg-white dark:bg-black
+              border border-black/8 dark:border-white/10"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4
+              border-b border-black/8 dark:border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="flex items-center justify-center w-7 h-7 rounded-lg
+                  bg-boba/10 dark:bg-boba/20">
+                  <Package size={14} className="text-boba" />
+                </div>
+                <h2 className="text-base font-semibold tracking-tight
+                  text-black dark:text-white">
+                  Tambahkan Produk
+                </h2>
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full
+                  bg-boba/10 dark:bg-boba/20 text-boba">
+                  Manual
+                </span>
               </div>
-              {productId && (
-                <p className="text-[10px] text-text-muted ml-1">Product ID: {productId}</p>
-              )}
-            </div>
-
-            {/* Title Input */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-text-secondary ml-1">Nama Produk <span className="text-red-400">*</span></label>
-              <input 
-                type="text" 
-                required
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Copas dari Shopee..."
-                className="input-glass w-full"
-                autoFocus
-              />
-            </div>
-
-            {/* Price Input */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-text-secondary ml-1">Harga (Rp) <span className="text-red-400">*</span></label>
-              <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-sm">Rp</span>
-                <input 
-                  type="number" 
-                  required
-                  min="0"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="0"
-                  className="input-glass w-full pl-9"
-                />
-              </div>
-            </div>
-
-            {/* Notes Input */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-text-secondary ml-1">Catatan (Opsional)</label>
-              <textarea 
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Alasan beli, tunggu gajian, dll..."
-                className="input-glass w-full h-20 resize-none"
-              />
-            </div>
-
-            {/* Actions */}
-            <div className="flex justify-end gap-3 pt-4 border-t border-[var(--color-glass-border)]">
-              <button 
-                type="button" 
+              <button
                 onClick={closeModal}
-                className="btn-ghost px-4"
+                className="p-1.5 rounded-lg transition-all duration-150
+                  text-black/40 dark:text-white/40
+                  hover:text-black dark:hover:text-white
+                  hover:bg-black/6 dark:hover:bg-white/8"
               >
-                Batal
-              </button>
-              <button 
-                type="submit" 
-                disabled={isSubmitting || !title || !price}
-                className="btn-primary px-6"
-              >
-                {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : 'Simpan ke Katalog'}
+                <X size={16} />
               </button>
             </div>
-          </form>
-        </motion.div>
-      </div>
+
+            <form onSubmit={handleSubmit}>
+              <div className="px-5 pt-4 pb-5 space-y-4">
+                {/* Info Box */}
+                <motion.div
+                  custom={0}
+                  variants={fieldVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="flex gap-2.5 p-3 rounded-xl
+                    bg-boba/8 dark:bg-boba/10
+                    border border-boba/20 dark:border-boba/25"
+                >
+                  <Info size={15} className="text-boba flex-shrink-0 mt-0.5" />
+                  <p className="text-xs leading-relaxed
+                    text-black/60 dark:text-white/60">
+                    Shopee melarang scraping otomatis. Isi{' '}
+                    <span className="font-medium text-black dark:text-white">
+                      Nama &amp; Harga
+                    </span>{' '}
+                    secara manual untuk menyimpannya ke Bobalog.
+                  </p>
+                </motion.div>
+
+                {/* URL Input */}
+                <motion.div custom={1} variants={fieldVariants} initial="hidden" animate="visible" className="space-y-1.5">
+                  <label className="text-[11px] font-medium uppercase tracking-wider ml-0.5
+                    text-black/40 dark:text-white/40">
+                    URL Shopee
+                  </label>
+                  <div className="relative group">
+                    <Link2 size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-150
+                      text-black/30 dark:text-white/30
+                      group-focus-within:text-boba" />
+                    <input
+                      type="text"
+                      value={urlInput}
+                      onChange={(e) => setUrlInput(e.target.value)}
+                      placeholder="https://shopee.co.id/..."
+                      className="w-full pl-9 pr-3.5 h-10 rounded-xl text-sm outline-none transition-all duration-150
+                        bg-black/4 dark:bg-white/6
+                        border border-black/10 dark:border-white/10
+                        text-black dark:text-white
+                        placeholder:text-black/30 dark:placeholder:text-white/30
+                        focus:border-boba/50 focus:ring-2 focus:ring-boba/15"
+                    />
+                  </div>
+                  {productId && (
+                    <p className="text-[10px] ml-1 font-mono
+                      text-black/40 dark:text-white/40">
+                      ID: <span className="text-boba">{productId}</span>
+                    </p>
+                  )}
+                </motion.div>
+
+                {/* Title Input */}
+                <motion.div custom={2} variants={fieldVariants} initial="hidden" animate="visible" className="space-y-1.5">
+                  <label className="text-[11px] font-medium uppercase tracking-wider ml-0.5
+                    text-black/40 dark:text-white/40">
+                    Nama Produk <span className="text-red-500 dark:text-red-400 normal-case">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Copas dari Shopee..."
+                    autoFocus
+                    className="w-full px-3.5 h-10 rounded-xl text-sm outline-none transition-all duration-150
+                      bg-black/4 dark:bg-white/6
+                      border border-black/10 dark:border-white/10
+                      text-black dark:text-white
+                      placeholder:text-black/30 dark:placeholder:text-white/30
+                      focus:border-boba/50 focus:ring-2 focus:ring-boba/15"
+                  />
+                </motion.div>
+
+                {/* Price Input */}
+                <motion.div custom={3} variants={fieldVariants} initial="hidden" animate="visible" className="space-y-1.5">
+                  <label className="text-[11px] font-medium uppercase tracking-wider ml-0.5
+                    text-black/40 dark:text-white/40">
+                    Harga <span className="text-red-500 dark:text-red-400 normal-case">*</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold select-none
+                      text-black/40 dark:text-white/40">
+                      Rp
+                    </span>
+                    <input
+                      type="number"
+                      required
+                      min="0"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="0"
+                      className="w-full pl-9 pr-3.5 h-10 rounded-xl text-sm outline-none transition-all duration-150
+                        bg-black/4 dark:bg-white/6
+                        border border-black/10 dark:border-white/10
+                        text-black dark:text-white
+                        placeholder:text-black/30 dark:placeholder:text-white/30
+                        focus:border-boba/50 focus:ring-2 focus:ring-boba/15
+                        [&::-webkit-inner-spin-button]:appearance-none
+                        [&::-webkit-outer-spin-button]:appearance-none
+                        [appearance:textfield]"
+                    />
+                  </div>
+                </motion.div>
+
+                {/* Notes */}
+                <motion.div custom={4} variants={fieldVariants} initial="hidden" animate="visible" className="space-y-1.5">
+                  <label className="text-[11px] font-medium uppercase tracking-wider ml-0.5
+                    text-black/40 dark:text-white/40">
+                    Catatan{' '}
+                    <span className="normal-case font-normal text-black/30 dark:text-white/30">
+                      — opsional
+                    </span>
+                  </label>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Alasan beli, tunggu gajian, dll..."
+                    className="w-full px-3.5 py-2.5 h-[76px] rounded-xl text-sm outline-none resize-none transition-all duration-150
+                      bg-black/4 dark:bg-white/6
+                      border border-black/10 dark:border-white/10
+                      text-black dark:text-white
+                      placeholder:text-black/30 dark:placeholder:text-white/30
+                      focus:border-boba/50 focus:ring-2 focus:ring-boba/15"
+                  />
+                </motion.div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-end gap-2.5 px-5 py-3.5
+                border-t border-black/8 dark:border-white/10
+                bg-black/2 dark:bg-white/3">
+                <button
+                  type="button"
+                  onClick={closeModal}
+                  className="px-4 h-9 rounded-xl text-sm font-medium transition-all duration-150
+                    text-black/60 dark:text-white/60
+                    hover:text-black dark:hover:text-white
+                    hover:bg-black/6 dark:hover:bg-white/8"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !title || !price}
+                  className="btn-primary px-5 h-9 text-sm min-w-[140px] flex items-center justify-center gap-2
+                    disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      <span>Menyimpan…</span>
+                    </>
+                  ) : (
+                    'Simpan ke Katalog'
+                  )}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
     </AnimatePresence>
   )
 }

@@ -4,8 +4,16 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Show, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs'
 import {
-  Home,
-  FolderOpen,
+  LayoutDashboard,
+  Package,
+  Tags,
+  Store,
+  LineChart,
+  BarChart3,
+  Database,
+  Sparkles,
+  Bookmark,
+  Download,
   Search,
   Settings,
   ChevronLeft,
@@ -19,10 +27,18 @@ import ThemeToggle from '@/components/theme/theme-toggle'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/', label: 'Beranda', icon: Home },
-  { href: '/collections', label: 'Koleksi', icon: FolderOpen },
+  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/products', label: 'Produk', icon: Package },
+  { href: '/categories', label: 'Kategori', icon: Tags },
+  { href: '/shops', label: 'Toko', icon: Store },
+  { href: '/price-tracker', label: 'Price Tracker', icon: LineChart },
+  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
+  { href: '/scraping', label: 'Scraping', icon: Database },
+  { href: '/ai-insights', label: 'AI Insights', icon: Sparkles },
+  { href: '/bookmarks', label: 'Bookmark', icon: Bookmark },
+  { href: '/export', label: 'Export', icon: Download },
   { href: '#search', label: 'Cari', icon: Search, action: 'search' },
-  { href: '/settings', label: 'Pengaturan', icon: Settings },
+  { href: '/settings', label: 'Settings', icon: Settings },
 ]
 
 export default function Sidebar() {
