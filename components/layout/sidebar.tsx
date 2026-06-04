@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import { Show, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs'
 import {
   LayoutDashboard,
+  Package,
   Search,
   Settings,
 } from 'lucide-react'
@@ -15,6 +16,7 @@ import { cn } from '@/lib/utils'
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/products', label: 'Produk', icon: Package },
   { href: '#search', label: 'Cari', icon: Search, action: 'search' },
   { href: '/settings', label: 'Settings', icon: Settings },
 ]
