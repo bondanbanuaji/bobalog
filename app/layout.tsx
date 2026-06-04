@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Outfit, DM_Sans } from "next/font/google";
 import ThemeProvider from "@/components/theme/theme-provider";
 import Chatbot from "@/components/ai/chatbot";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -61,6 +62,8 @@ export default function RootLayout({
               {children}
               <Chatbot />
             </div>
+            
+            <Toaster position="top-center" richColors />
           </ThemeProvider>
         </ClerkProvider>
       </body>

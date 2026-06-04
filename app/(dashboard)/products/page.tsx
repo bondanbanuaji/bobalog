@@ -39,7 +39,7 @@ export default function ProductsPage() {
         </div>
         <button 
           onClick={() => setQuickAddModalOpen(true)}
-          className="bg-boba hover:bg-boba-hover text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors flex items-center gap-2 whitespace-nowrap"
+          className="btn btn-primary text-white"
         >
           <Package size={16} /> Tambah Produk
         </button>

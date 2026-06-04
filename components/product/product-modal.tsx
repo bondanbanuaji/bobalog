@@ -152,7 +152,7 @@ export default function ProductModal() {
                     href={product.shopeeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-primary h-8 px-3 rounded-lg text-xs inline-flex items-center justify-center gap-1"
+                    className="btn btn-primary h-8 px-3 rounded-lg text-xs"
                   >
                     <span>Buka Shopee</span>
                     <ExternalLink size={12} />
@@ -163,61 +163,61 @@ export default function ProductModal() {
                   <button 
                     onClick={handleSave}
                     disabled={isSubmitting}
-                    className="btn-primary h-8 px-3 rounded-lg text-xs inline-flex items-center justify-center gap-1 bg-boba hover:bg-boba-hover"
+                    className="btn btn-success h-8 px-3 rounded-lg text-xs"
                   >
                     {isSubmitting ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
                     <span>Simpan</span>
                   </button>
                 ) : (
-                  <button 
-                    onClick={() => setIsEditing(true)}
-                    className="h-8 px-3 flex items-center justify-center gap-1 rounded-lg border border-[var(--color-glass-border)] hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors text-xs"
-                  >
-                    <Edit2 size={12} />
-                    <span>Edit</span>
-                  </button>
-                )}
+                  <>
+                    <button 
+                      onClick={() => setIsEditing(true)}
+                      className="btn btn-glass h-8 px-3 rounded-lg text-xs text-text-muted"
+                    >
+                      <Edit2 size={12} />
+                      <span>Edit</span>
+                    </button>
+                    
+                    <button 
+                      onClick={() => setIsDeleting(true)}
+                      className="btn btn-danger h-8 px-3 rounded-lg text-xs"
+                    >
+                      <Trash2 size={12} />
+                      <span>Hapus</span>
+                    </button>
 
-                <div className="relative" ref={menuRef}>
-                  <button 
-                    onClick={() => setShowMenu(!showMenu)}
-                    className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors"
-                  >
-                    <MoreVertical size={16} />
-                  </button>
-
-                  <AnimatePresence>
-                    {showMenu && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                        className="absolute right-0 top-full mt-2 w-48 bg-bg-surface border border-[var(--color-glass-border)] rounded-xl shadow-xl overflow-hidden py-1 z-50"
+                    <div className="relative" ref={menuRef}>
+                      <button 
+                        onClick={() => setShowMenu(!showMenu)}
+                        className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors"
                       >
-                        <button
-                          onClick={() => {
-                            handleToggleArchive()
-                            setShowMenu(false)
-                          }}
-                          className="w-full px-4 py-2 text-left text-sm text-text-secondary hover:bg-[var(--color-glass-bg-hover)] hover:text-text-primary flex items-center gap-2"
-                        >
-                          <Archive size={14} />
-                          {product.status === ProductStatus.ARCHIVED ? 'Batal Arsipkan' : 'Arsipkan'}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setIsDeleting(true)
-                            setShowMenu(false)
-                          }}
-                          className="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-500/10 flex items-center gap-2"
-                        >
-                          <Trash2 size={14} />
-                          Hapus Produk
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                        <MoreVertical size={16} />
+                      </button>
+
+                      <AnimatePresence>
+                        {showMenu && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            className="absolute right-0 top-full mt-2 w-48 bg-bg-surface border border-[var(--color-glass-border)] rounded-xl shadow-xl overflow-hidden py-1 z-50"
+                          >
+                            <button
+                              onClick={() => {
+                                handleToggleArchive()
+                                setShowMenu(false)
+                              }}
+                              className="w-full px-4 py-2 text-left text-sm text-text-secondary hover:bg-[var(--color-glass-bg-hover)] hover:text-text-primary flex items-center gap-2"
+                            >
+                              <Archive size={14} />
+                              {product.status === ProductStatus.ARCHIVED ? 'Batal Arsipkan' : 'Arsipkan'}
+                            </button>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -231,14 +231,14 @@ export default function ProductModal() {
                   <div className="flex gap-2 justify-end">
                     <button 
                       onClick={() => setIsDeleting(false)}
-                      className="px-3 py-1.5 text-xs rounded-lg hover:bg-red-500/10 text-red-400 transition-colors"
+                      className="btn btn-ghost px-3 py-1.5 text-xs rounded-lg text-red-400"
                     >
                       Batal
                     </button>
                     <button 
                       onClick={handleDelete}
                       disabled={isSubmitting}
-                      className="px-3 py-1.5 text-xs rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-50 flex items-center gap-2"
+                      className="btn btn-danger px-3 py-1.5 text-xs rounded-lg"
                     >
                       {isSubmitting && <Loader2 size={12} className="animate-spin" />}
                       Ya, Hapus

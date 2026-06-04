@@ -280,17 +280,14 @@ export default function QuickAddModal() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 h-9 rounded-xl text-sm font-medium transition-all duration-150
-                    text-black/60 dark:text-white/60
-                    hover:text-black dark:hover:text-white
-                    hover:bg-black/6 dark:hover:bg-white/8"
+                  className="btn btn-ghost h-9 px-4 rounded-xl text-sm"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting || !title}
-                  className="btn-primary px-5 h-9 text-sm min-w-[140px] flex items-center justify-center gap-2
+                  className="btn btn-primary px-5 h-9 text-sm min-w-[140px] flex items-center justify-center gap-2
                     disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
