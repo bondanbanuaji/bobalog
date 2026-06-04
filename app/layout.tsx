@@ -2,6 +2,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Outfit, DM_Sans } from "next/font/google";
 import ThemeProvider from "@/components/theme/theme-provider";
+import Chatbot from "@/components/ai/chatbot";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -58,6 +59,7 @@ export default function RootLayout({
             {/* App Content */}
             <div className="relative z-10">
               {children}
+              <Chatbot />
             </div>
           </ThemeProvider>
         </ClerkProvider>

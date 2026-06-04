@@ -46,7 +46,6 @@ export async function getCollections() {
         // Ensure dates are stringified/serialized or kept as dates
         createdAt: cp.product.createdAt,
         updatedAt: cp.product.updatedAt,
-        lastScraped: cp.product.lastScraped || undefined,
       })),
       createdAt: col.createdAt,
       updatedAt: col.updatedAt,
@@ -75,9 +74,7 @@ export async function getCollectionDetail(id: string) {
                     tag: true,
                   },
                 },
-                priceHistory: {
-                  orderBy: { checkedAt: 'desc' },
-                },
+
               },
             },
           },
@@ -100,7 +97,7 @@ export async function getCollectionDetail(id: string) {
       productCount: col.products.length,
       products: col.products.map((cp: any) => ({
         ...cp.product,
-        priceHistory: cp.product.priceHistory,
+
         tags: cp.product.tags,
       })),
       createdAt: col.createdAt,

@@ -1,31 +1,119 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ExternalLink, Archive, MoreVertical, Store, Star, Box, ChevronLeft } from 'lucide-react'
+import { X, ExternalLink, Archive, MoreVertical, Store, Star, Box, ChevronLeft, Edit2, Trash2, Check, Loader2 } from 'lucide-react'
 import { useUIStore } from '@/store/ui.store'
-import PriceDisplay from './price-display'
+import { updateProduct, deleteProduct, toggleArchive } from '@/actions/product.actions'
+import { toast } from 'sonner'
+import { Priority, ProductStatus } from '@/types'
+
 import ProductStatusBadge from './product-status-badge'
-import { cn, formatNumber, getTimeAgo } from '@/lib/utils'
+import { cn, formatNumber } from '@/lib/utils'
 
 export default function ProductModal() {
-  const { activeProductId, setActiveProductId, products } = useUIStore()
+  const { activeProductId, setActiveProductId, products, updateProduct: updateStoreProduct, removeProduct } = useUIStore()
   
   const product = products.find(p => p.id === activeProductId)
+  
+  const [isEditing, setIsEditing] = useState(false)
+  const [showMenu, setShowMenu] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  
+  const [editTitle, setEditTitle] = useState('')
+  const [editNotes, setEditNotes] = useState('')
+  const [editPriority, setEditPriority] = useState<Priority>(Priority.NORMAL)
+  const [editStatus, setEditStatus] = useState<ProductStatus>(ProductStatus.ACTIVE)
+  
+  const menuRef = useRef<HTMLDivElement>(null)
+  
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Prevent background scrolling when modal is open
   useEffect(() => {
     if (activeProductId) {
       document.body.style.overflow = 'hidden'
+      if (product) {
+        setEditTitle(product.title)
+        setEditNotes(product.notes || '')
+        setEditPriority(product.priority)
+        setEditStatus(product.status)
+        setIsEditing(false)
+        setShowMenu(false)
+        setIsDeleting(false)
+      }
     } else {
       document.body.style.overflow = 'unset'
     }
     return () => { document.body.style.overflow = 'unset' }
-  }, [activeProductId])
+  }, [activeProductId, product])
 
   if (!product) return null
 
   const imageUrl = product.thumbnail || 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=2070&auto=format&fit=crop'
+
+  const handleSave = async () => {
+    setIsSubmitting(true)
+    try {
+      const result = await updateProduct(product.id, {
+        title: editTitle,
+        notes: editNotes,
+        priority: editPriority,
+        status: editStatus
+      })
+      if (result.success && result.product) {
+        updateStoreProduct(product.id, result.product as any)
+        toast.success('Perubahan disimpan')
+        setIsEditing(false)
+      } else {
+        throw new Error(result.error)
+      }
+    } catch (e: any) {
+      toast.error(e.message || 'Gagal menyimpan')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+  
+  const handleDelete = async () => {
+    setIsSubmitting(true)
+    try {
+      const result = await deleteProduct(product.id)
+      if (result.success) {
+        toast.success('Produk dihapus')
+        removeProduct(product.id)
+        setActiveProductId(null)
+      } else {
+        throw new Error(result.error)
+      }
+    } catch (e: any) {
+      toast.error(e.message || 'Gagal menghapus')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleToggleArchive = async () => {
+    try {
+      const result = await toggleArchive(product.id)
+      if (result.success && result.product) {
+        updateStoreProduct(product.id, result.product as any)
+        toast.success(result.product.status === ProductStatus.ARCHIVED ? 'Diarsipkan' : 'Diaktifkan kembali')
+      }
+    } catch (e) {
+      toast.error('Gagal mengubah status')
+    }
+  }
 
   return (
     <AnimatePresence>
@@ -58,29 +146,107 @@ export default function ProductModal() {
                 Kembali
               </button>
               
-              <div className="flex items-center gap-2">
-  <a
-    href={product.shopeeUrl}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="btn-primary h-8 px-3 rounded-lg text-xs inline-flex items-center justify-center gap-1"
-  >
-    <span>Buka Shopee</span>
-    <ExternalLink size={12} />
-  </a>
+              <div className="flex items-center gap-2 relative">
+                {product.shopeeUrl && (
+                  <a
+                    href={product.shopeeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary h-8 px-3 rounded-lg text-xs inline-flex items-center justify-center gap-1"
+                  >
+                    <span>Buka Shopee</span>
+                    <ExternalLink size={12} />
+                  </a>
+                )}
+                
+                {isEditing ? (
+                  <button 
+                    onClick={handleSave}
+                    disabled={isSubmitting}
+                    className="btn-primary h-8 px-3 rounded-lg text-xs inline-flex items-center justify-center gap-1 bg-boba hover:bg-boba-hover"
+                  >
+                    {isSubmitting ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+                    <span>Simpan</span>
+                  </button>
+                ) : (
+                  <button 
+                    onClick={() => setIsEditing(true)}
+                    className="h-8 px-3 flex items-center justify-center gap-1 rounded-lg border border-[var(--color-glass-border)] hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors text-xs"
+                  >
+                    <Edit2 size={12} />
+                    <span>Edit</span>
+                  </button>
+                )}
 
-  <button className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors">
-    <Archive size={16} />
-  </button>
+                <div className="relative" ref={menuRef}>
+                  <button 
+                    onClick={() => setShowMenu(!showMenu)}
+                    className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors"
+                  >
+                    <MoreVertical size={16} />
+                  </button>
 
-  <button className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors">
-    <MoreVertical size={16} />
-  </button>
-</div>
+                  <AnimatePresence>
+                    {showMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                        className="absolute right-0 top-full mt-2 w-48 bg-bg-surface border border-[var(--color-glass-border)] rounded-xl shadow-xl overflow-hidden py-1 z-50"
+                      >
+                        <button
+                          onClick={() => {
+                            handleToggleArchive()
+                            setShowMenu(false)
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm text-text-secondary hover:bg-[var(--color-glass-bg-hover)] hover:text-text-primary flex items-center gap-2"
+                        >
+                          <Archive size={14} />
+                          {product.status === ProductStatus.ARCHIVED ? 'Batal Arsipkan' : 'Arsipkan'}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsDeleting(true)
+                            setShowMenu(false)
+                          }}
+                          className="w-full px-4 py-2 text-left text-sm text-red-500 hover:bg-red-500/10 flex items-center gap-2"
+                        >
+                          <Trash2 size={14} />
+                          Hapus Produk
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
             </div>
 
             {/* Content Scroll Area */}
             <div className="flex-1 overflow-y-auto">
+              
+              {isDeleting && (
+                <div className="p-4 m-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+                  <h4 className="text-red-500 font-medium mb-2">Hapus Produk?</h4>
+                  <p className="text-sm text-red-400/80 mb-4">Tindakan ini tidak dapat dibatalkan.</p>
+                  <div className="flex gap-2 justify-end">
+                    <button 
+                      onClick={() => setIsDeleting(false)}
+                      className="px-3 py-1.5 text-xs rounded-lg hover:bg-red-500/10 text-red-400 transition-colors"
+                    >
+                      Batal
+                    </button>
+                    <button 
+                      onClick={handleDelete}
+                      disabled={isSubmitting}
+                      className="px-3 py-1.5 text-xs rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors disabled:opacity-50 flex items-center gap-2"
+                    >
+                      {isSubmitting && <Loader2 size={12} className="animate-spin" />}
+                      Ya, Hapus
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Image Hero */}
               <div className="relative aspect-square bg-black">
                 <img
@@ -97,7 +263,15 @@ export default function ProductModal() {
               <div className="p-6 space-y-8">
                 {/* Title & Price */}
                 <div className="space-y-4">
-                  <h2 className="text-xl font-medium leading-snug">{product.title}</h2>
+                  {isEditing ? (
+                    <textarea 
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="w-full text-xl font-medium leading-snug bg-transparent border-b border-[var(--color-glass-border)] focus:border-boba outline-none resize-none overflow-hidden min-h-[60px]"
+                    />
+                  ) : (
+                    <h2 className="text-xl font-medium leading-snug">{product.title}</h2>
+                  )}
                   
                   <div className="flex items-center gap-4 text-sm text-text-secondary">
                     {product.shopName && (
@@ -116,18 +290,40 @@ export default function ProductModal() {
                     </span>
                   </div>
 
-                  <div className="pt-2">
-                    <PriceDisplay
-                      price={product.price}
-                      originalPrice={product.originalPrice}
-                      discountPercent={product.discountPercent}
-                      size="lg"
-                    />
-                  </div>
+                  {isEditing && (
+                    <div className="flex gap-4 pt-4">
+                      <div className="flex-1 space-y-2">
+                        <label className="text-xs text-text-muted">Prioritas</label>
+                        <select 
+                          value={editPriority}
+                          onChange={(e) => setEditPriority(e.target.value as Priority)}
+                          className="w-full h-9 rounded-lg bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm px-3 outline-none focus:border-boba"
+                        >
+                          <option value="LOW">Low</option>
+                          <option value="NORMAL">Normal</option>
+                          <option value="HIGH">High</option>
+                          <option value="MUST_BUY">Must Buy</option>
+                        </select>
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <label className="text-xs text-text-muted">Status</label>
+                        <select 
+                          value={editStatus}
+                          onChange={(e) => setEditStatus(e.target.value as ProductStatus)}
+                          className="w-full h-9 rounded-lg bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm px-3 outline-none focus:border-boba"
+                        >
+                          <option value="ACTIVE">Active</option>
+                          <option value="BOUGHT">Bought</option>
+                          <option value="UNAVAILABLE">Unavailable</option>
+                          <option value="ARCHIVED">Archived</option>
+                        </select>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Variations */}
-                {product.variations && product.variations.length > 0 && (
+                {product.variations && product.variations.length > 0 && !isEditing && (
                   <div className="space-y-4 pt-6 border-t border-[var(--color-glass-border)]">
                     <h3 className="text-sm font-medium text-text-secondary uppercase tracking-wider">Variasi</h3>
                     <div className="space-y-4">
@@ -152,15 +348,22 @@ export default function ProductModal() {
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-medium text-text-secondary uppercase tracking-wider">Catatan Pribadi</h3>
                   </div>
-                  <textarea
-                    defaultValue={product.notes}
-                    placeholder="Tambahkan catatan untuk produk ini..."
-                    className="w-full h-24 p-3 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-boba/50 transition-colors resize-none"
-                  />
+                  {isEditing ? (
+                    <textarea
+                      value={editNotes}
+                      onChange={(e) => setEditNotes(e.target.value)}
+                      placeholder="Tambahkan catatan untuk produk ini..."
+                      className="w-full h-32 p-3 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-boba transition-colors resize-none"
+                    />
+                  ) : (
+                    <div className="w-full min-h-[60px] p-4 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary whitespace-pre-wrap">
+                      {product.notes || <span className="text-text-muted italic">Belum ada catatan.</span>}
+                    </div>
+                  )}
                 </div>
 
                 {/* Tags */}
-                {product.tags && product.tags.length > 0 && (
+                {product.tags && product.tags.length > 0 && !isEditing && (
                   <div className="space-y-3 pt-6 border-t border-[var(--color-glass-border)]">
                     <h3 className="text-sm font-medium text-text-secondary uppercase tracking-wider">Tags</h3>
                     <div className="flex flex-wrap gap-2">
@@ -177,17 +380,13 @@ export default function ProductModal() {
                           {pt.tag.name}
                         </span>
                       ))}
-                      <button className="px-2.5 py-1 rounded-md border border-dashed border-[var(--color-glass-border-hover)] text-xs text-text-muted hover:text-text-primary hover:border-boba/40 transition-colors">
-                        + Tambah Tag
-                      </button>
                     </div>
                   </div>
                 )}
                 
                 {/* Meta */}
                 <div className="pt-6 border-t border-[var(--color-glass-border)] flex items-center justify-between text-[11px] text-text-muted">
-                  <p>Ditambahkan: {product.createdAt.toLocaleDateString('id-ID')}</p>
-                  <p>Update info: {product.lastScraped ? getTimeAgo(product.lastScraped) : '-'}</p>
+                  <p>Ditambahkan: {new Date(product.createdAt).toLocaleDateString('id-ID')}</p>
                 </div>
               </div>
             </div>

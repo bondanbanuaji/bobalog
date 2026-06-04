@@ -30,11 +30,7 @@ export default function ProductSkeleton({ count = 6, className }: ProductSkeleto
             {/* Shop name */}
             <div className="h-3 w-1/2 rounded-lg shimmer" />
 
-            {/* Price */}
-            <div className="flex items-center gap-2">
-              <div className="h-5 w-28 rounded-lg shimmer" />
-              <div className="h-3 w-16 rounded-lg shimmer" />
-            </div>
+
 
             {/* Rating & sold */}
             <div className="flex items-center gap-3">

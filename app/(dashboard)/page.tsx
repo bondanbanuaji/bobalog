@@ -1,6 +1,6 @@
 'use client'
 
-import { Package, Store, Tags, TrendingDown, AlertCircle } from 'lucide-react'
+import { Package, Store, Tags } from 'lucide-react'
 import { useUIStore } from '@/store/ui.store'
 import { motion } from 'framer-motion'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
@@ -19,16 +19,11 @@ export default function DashboardOverviewPage() {
     
     const totalKategori = collections.length
     
-    const hargaTurun = products.filter(p => (p.discountPercent || 0) > 0 || p.priceChange === 'dropped').length
-    
-    const stokHabis = products.filter(p => p.stock === 0).length
 
     return [
       { label: 'Total Produk', value: totalProduk, icon: Package, color: 'text-boba' },
       { label: 'Toko Dipantau', value: totalToko, icon: Store, color: 'text-taro' },
-      { label: 'Kategori', value: totalKategori, icon: Tags, color: 'text-matcha' },
-      { label: 'Harga Turun', value: hargaTurun, icon: TrendingDown, color: 'text-green-500' },
-      { label: 'Stok Habis', value: stokHabis, icon: AlertCircle, color: 'text-red-500' },
+      { label: 'Koleksi', value: totalKategori, icon: Tags, color: 'text-matcha' },
     ]
   }, [products, collections])
 

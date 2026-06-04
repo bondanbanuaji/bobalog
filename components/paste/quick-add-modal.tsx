@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, Variants } from 'framer-motion'
 import { X, Link2, Info, Loader2, Package } from 'lucide-react'
 import { useUIStore } from '@/store/ui.store'
-import { extractShopeeProductId } from '@/lib/utils'
+import { extractShopeeProductId, isShopeeUrl } from '@/lib/utils'
 import { saveProduct } from '@/actions/product.actions'
 import { toast } from 'sonner'
 
@@ -12,10 +12,12 @@ export default function QuickAddModal() {
   const { quickAddModalOpen, setQuickAddModalOpen, pastedUrl, setPastedUrl, addProduct } = useUIStore()
 
   const [title, setTitle] = useState('')
-  const [price, setPrice] = useState('')
   const [notes, setNotes] = useState('')
   const [urlInput, setUrlInput] = useState('')
+  const [resolvedUrl, setResolvedUrl] = useState('')
+  const [thumbnail, setThumbnail] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoadingMeta, setIsLoadingMeta] = useState(false)
 
   useEffect(() => {
     if (quickAddModalOpen) {
@@ -23,7 +25,40 @@ export default function QuickAddModal() {
     }
   }, [quickAddModalOpen, pastedUrl])
 
-  const productId = urlInput ? extractShopeeProductId(urlInput) : null
+  useEffect(() => {
+    const fetchMeta = async () => {
+      if (!urlInput || !isShopeeUrl(urlInput)) return
+      
+      // Jika title sudah diisi manual, jangan overwrite (kecuali kosong)
+      // Tapi kita selalu ambil meta-nya untuk cari gambar
+      setIsLoadingMeta(true)
+      try {
+        const res = await fetch('/api/scrape/shopee', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: urlInput })
+        })
+        const data = await res.json()
+        if (data.success) {
+          if (data.title && !title) setTitle(data.title)
+          if (data.image) setThumbnail(data.image)
+          if (data.description && !notes) setNotes(data.description)
+          if (data.resolvedUrl) setResolvedUrl(data.resolvedUrl)
+        }
+      } catch (e) {
+        console.error('Failed to fetch shopee meta', e)
+      } finally {
+        setIsLoadingMeta(false)
+      }
+    }
+
+    const timer = setTimeout(fetchMeta, 800)
+    return () => clearTimeout(timer)
+  }, [urlInput])
+
+  // Use resolved URL (from redirect) if available, otherwise use input
+  const finalUrl = resolvedUrl || urlInput
+  const productId = finalUrl ? extractShopeeProductId(finalUrl) : null
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -32,10 +67,10 @@ export default function QuickAddModal() {
     try {
       const result = await saveProduct({
         title,
-        price: Number(price),
         notes,
-        shopeeUrl: urlInput || '',
-        shopeeProductId: productId || undefined
+        shopeeUrl: finalUrl || urlInput || '',
+        shopeeProductId: productId || undefined,
+        thumbnail: thumbnail || undefined
       })
 
       if (result.success && result.product) {
@@ -58,9 +93,10 @@ export default function QuickAddModal() {
     setTimeout(() => {
       setPastedUrl(null)
       setUrlInput('')
+      setResolvedUrl('')
       setTitle('')
-      setPrice('')
       setNotes('')
+      setThumbnail('')
     }, 300)
   }
 
@@ -137,14 +173,19 @@ export default function QuickAddModal() {
                     bg-boba/8 dark:bg-boba/10
                     border border-boba/20 dark:border-boba/25"
                 >
-                  <Info size={15} className="text-boba flex-shrink-0 mt-0.5" />
-                  <p className="text-xs leading-relaxed
-                    text-black/60 dark:text-white/60">
-                    Shopee melarang scraping otomatis. Isi{' '}
-                    <span className="font-medium text-black dark:text-white">
-                      Nama &amp; Harga
-                    </span>{' '}
-                    secara manual untuk menyimpannya ke Bobalog.
+                  {isLoadingMeta ? (
+                    <Loader2 size={15} className="text-boba flex-shrink-0 mt-0.5 animate-spin" />
+                  ) : (
+                    <Info size={15} className="text-boba flex-shrink-0 mt-0.5" />
+                  )}
+                  <p className="text-xs leading-relaxed text-black/60 dark:text-white/60">
+                    {isLoadingMeta ? (
+                      'Mendeteksi data produk secara otomatis...'
+                    ) : (
+                      <>
+                        Paste link produk Shopee untuk mendeteksi gambar otomatis, atau isi data secara manual jika produk dari luar Shopee.
+                      </>
+                    )}
                   </p>
                 </motion.div>
 
@@ -185,49 +226,26 @@ export default function QuickAddModal() {
                     text-black/40 dark:text-white/40">
                     Nama Produk <span className="text-red-500 dark:text-red-400 normal-case">*</span>
                   </label>
-                  <input
-                    type="text"
-                    required
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Copas dari Shopee..."
-                    autoFocus
-                    className="w-full px-3.5 h-10 rounded-xl text-sm outline-none transition-all duration-150
-                      bg-black/4 dark:bg-white/6
-                      border border-black/10 dark:border-white/10
-                      text-black dark:text-white
-                      placeholder:text-black/30 dark:placeholder:text-white/30
-                      focus:border-boba/50 focus:ring-2 focus:ring-boba/15"
-                  />
-                </motion.div>
-
-                {/* Price Input */}
-                <motion.div custom={3} variants={fieldVariants} initial="hidden" animate="visible" className="space-y-1.5">
-                  <label className="text-[11px] font-medium uppercase tracking-wider ml-0.5
-                    text-black/40 dark:text-white/40">
-                    Harga <span className="text-red-500 dark:text-red-400 normal-case">*</span>
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold select-none
-                      text-black/40 dark:text-white/40">
-                      Rp
-                    </span>
+                  <div className="flex gap-2">
+                    {thumbnail && (
+                      <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 border border-black/10 dark:border-white/10 relative">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={thumbnail} alt="Preview" className="w-full h-full object-cover" />
+                      </div>
+                    )}
                     <input
-                      type="number"
+                      type="text"
                       required
-                      min="0"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      placeholder="0"
-                      className="w-full pl-9 pr-3.5 h-10 rounded-xl text-sm outline-none transition-all duration-150
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder="Copas dari Shopee..."
+                      autoFocus
+                      className="w-full px-3.5 h-10 rounded-xl text-sm outline-none transition-all duration-150
                         bg-black/4 dark:bg-white/6
                         border border-black/10 dark:border-white/10
                         text-black dark:text-white
                         placeholder:text-black/30 dark:placeholder:text-white/30
-                        focus:border-boba/50 focus:ring-2 focus:ring-boba/15
-                        [&::-webkit-inner-spin-button]:appearance-none
-                        [&::-webkit-outer-spin-button]:appearance-none
-                        [appearance:textfield]"
+                        focus:border-boba/50 focus:ring-2 focus:ring-boba/15"
                     />
                   </div>
                 </motion.div>
@@ -271,7 +289,7 @@ export default function QuickAddModal() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting || !title || !price}
+                  disabled={isSubmitting || !title}
                   className="btn-primary px-5 h-9 text-sm min-w-[140px] flex items-center justify-center gap-2
                     disabled:opacity-40 disabled:cursor-not-allowed"
                 >

@@ -28,7 +28,9 @@ export default function Navbar() {
         {/* Right actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ml-auto">
           {/* Theme toggle */}
-          <ThemeToggle className="w-auto h-auto !p-2" />
+          <div className="hidden lg:flex">
+            <ThemeToggle className="w-auto h-auto !p-2" />
+          </div>
 
           {/* Search shortcut */}
           <button

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Command } from 'cmdk'
 import { Search, ShoppingBag, FolderOpen, Tag, Star, ArrowRight } from 'lucide-react'
 import { useUIStore } from '@/store/ui.store'
-import { formatPrice } from '@/lib/utils'
+
 
 export default function SearchCommand() {
   const router = useRouter()
@@ -106,7 +106,7 @@ export default function SearchCommand() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-text-primary truncate">{product.title}</p>
-                      <p className="text-xs text-text-muted truncate">Rp {formatPrice(product.price)} • {product.shopName}</p>
+                      <p className="text-xs text-text-muted truncate">{product.shopName}</p>
                     </div>
                     <ArrowRight size={14} className="text-text-muted opacity-0 group-aria-selected:opacity-100 transition-opacity" />
                   </Command.Item>

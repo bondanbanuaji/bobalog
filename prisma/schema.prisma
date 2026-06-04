@@ -20,13 +20,9 @@ model Product {
   title           String
   thumbnail       String?
   gallery         String[]
-  price           Int           // dalam rupiah
-  originalPrice   Int?
   discountPercent Int?
 
   // Shop Info
-  shopId          String?
-  shop            Shop?         @relation(fields: [shopId], references: [id])
   shopName        String?       // Cached shop name
   shopUrl         String?       // Cached shop url
 
@@ -41,17 +37,11 @@ model Product {
   priority        Priority      @default(NORMAL)
   status          ProductStatus @default(ACTIVE)
 
-  // Scrape State
-  scrapeStatus    ScrapeStatus  @default(PENDING)
-  lastScraped     DateTime?
-
-  // Analytics & Insight
+  // Analytics
   views           Int           @default(0)
   clicks          Int           @default(0)
-  aiInsight       AiInsight?
 
   // Relations
-  priceHistory    PriceHistory[]
   collections     CollectionProduct[]
   tags            ProductTag[]
 
@@ -62,15 +52,6 @@ model Product {
   @@index([shopeeUrl])
 }
 
-model PriceHistory {
-  id        String   @id @default(cuid())
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  price     Int
-  checkedAt DateTime @default(now())
-
-  @@index([productId])
-}
 
 model Collection {
   id          String              @id @default(cuid())
@@ -139,84 +120,4 @@ enum ProductStatus {
   UNAVAILABLE
 }
 
-enum ScrapeStatus {
-  PENDING
-  PREVIEW
-  BASIC
-  FULL
-  FAILED
-}
 
-enum ScrapeJobStatus {
-  PENDING
-  RUNNING
-  SUCCESS
-  FAILED
-}
-
-model Shop {
-  id              String        @id @default(cuid())
-  userId          String
-  
-  name            String
-  url             String?
-  username        String?
-  rating          Float?
-  totalSales      Int?
-  location        String?
-
-  products        Product[]
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  @@index([userId])
-  @@unique([userId, name])
-}
-
-model ScrapeJob {
-  id              String        @id @default(cuid())
-  userId          String
-  targetUrl       String
-  status          ScrapeJobStatus @default(PENDING)
-  priority        Priority      @default(NORMAL)
-  errorMessage    String?       @db.Text
-  
-  logs            ScrapeLog[]
-  
-  nextRunAt       DateTime?
-  lastRunAt       DateTime?
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  
-  @@index([userId])
-}
-
-model ScrapeLog {
-  id              String        @id @default(cuid())
-  jobId           String
-  job             ScrapeJob     @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  message         String        @db.Text
-  level           String        @default("INFO")
-  
-  createdAt       DateTime      @default(now())
-  
-  @@index([jobId])
-}
-
-model AiInsight {
-  id              String        @id @default(cuid())
-  productId       String        @unique
-  product         Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
-  
-  summary         String?       @db.Text
-  pros            String[]
-  cons            String[]
-  viralScore      Int?
-  autoCategory    String?
-  isTrending      Boolean       @default(false)
-  
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-}

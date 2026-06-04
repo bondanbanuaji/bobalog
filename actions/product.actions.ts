@@ -2,17 +2,17 @@
 
 import { prisma } from '@/lib/prisma'
 import { auth } from '@clerk/nextjs/server'
-import { Priority, ProductStatus, ScrapeStatus } from '@/types'
+import { Priority, ProductStatus } from '@/types'
 import { revalidatePath } from 'next/cache'
 
 export async function getProducts(filters?: {
   status?: ProductStatus
   priority?: Priority
-  scrapeStatus?: ScrapeStatus
+
   collectionId?: string
   tagId?: string
   search?: string
-  sortBy?: 'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'name'
+  sortBy?: 'newest' | 'oldest' | 'name'
 }) {
   const { userId } = await auth()
   if (!userId) return []
@@ -21,7 +21,6 @@ export async function getProducts(filters?: {
 
   if (filters?.status) where.status = filters.status
   if (filters?.priority) where.priority = filters.priority
-  if (filters?.scrapeStatus) where.scrapeStatus = filters.scrapeStatus
 
   if (filters?.collectionId) {
     where.collections = {
@@ -56,12 +55,6 @@ export async function getProducts(filters?: {
       case 'oldest':
         orderBy = { createdAt: 'asc' }
         break
-      case 'price_asc':
-        orderBy = { price: 'asc' }
-        break
-      case 'price_desc':
-        orderBy = { price: 'desc' }
-        break
       case 'name':
         orderBy = { title: 'asc' }
         break
@@ -73,9 +66,6 @@ export async function getProducts(filters?: {
       where,
       orderBy,
       include: {
-        priceHistory: {
-          orderBy: { checkedAt: 'desc' },
-        },
         tags: {
           include: {
             tag: true,
@@ -93,10 +83,10 @@ export async function getProducts(filters?: {
 export async function saveProduct(data: {
   shopeeUrl: string
   title: string
-  price: number
   notes?: string
   collectionId?: string
   shopeeProductId?: string
+  thumbnail?: string
 }) {
   const { userId } = await auth()
   if (!userId) throw new Error('Unauthorized')
@@ -110,21 +100,14 @@ export async function saveProduct(data: {
           shopeeUrl: data.shopeeUrl,
           shopeeProductId: data.shopeeProductId,
           title: data.title,
-          price: data.price,
+          thumbnail: data.thumbnail,
           notes: data.notes,
           priority: Priority.NORMAL,
           status: ProductStatus.ACTIVE,
-          scrapeStatus: ScrapeStatus.BASIC, // Manual entries start with basic metadata
+
         },
       })
 
-      // 2. Add to price history
-      await tx.priceHistory.create({
-        data: {
-          productId: newProduct.id,
-          price: data.price,
-        },
-      })
 
       // 3. Add to collection if specified
       if (data.collectionId) {
@@ -154,6 +137,8 @@ export async function saveProduct(data: {
 export async function updateProduct(
   id: string,
   data: {
+    title?: string
+    thumbnail?: string
     notes?: string
     priority?: Priority
     status?: ProductStatus
@@ -175,6 +160,8 @@ export async function updateProduct(
       }
 
       const updateData: any = {}
+      if (data.title !== undefined) updateData.title = data.title
+      if (data.thumbnail !== undefined) updateData.thumbnail = data.thumbnail
       if (data.notes !== undefined) updateData.notes = data.notes
       if (data.priority !== undefined) updateData.priority = data.priority
       if (data.status !== undefined) updateData.status = data.status

@@ -5,21 +5,8 @@ import { usePathname } from 'next/navigation'
 import { Show, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs'
 import {
   LayoutDashboard,
-  Package,
-  Tags,
-  Store,
-  LineChart,
-  BarChart3,
-  Database,
-  Sparkles,
-  Bookmark,
-  Download,
   Search,
   Settings,
-  ChevronLeft,
-  ChevronRight,
-  Sun,
-  Moon,
 } from 'lucide-react'
 import { Logo } from '@/components/ui/logo'
 import { useUIStore } from '@/store/ui.store'
@@ -28,15 +15,6 @@ import { cn } from '@/lib/utils'
 
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/products', label: 'Produk', icon: Package },
-  { href: '/categories', label: 'Kategori', icon: Tags },
-  { href: '/shops', label: 'Toko', icon: Store },
-  { href: '/price-tracker', label: 'Price Tracker', icon: LineChart },
-  { href: '/analytics', label: 'Analytics', icon: BarChart3 },
-  { href: '/scraping', label: 'Scraping', icon: Database },
-  { href: '/ai-insights', label: 'AI Insights', icon: Sparkles },
-  { href: '/bookmarks', label: 'Bookmark', icon: Bookmark },
-  { href: '/export', label: 'Export', icon: Download },
   { href: '#search', label: 'Cari', icon: Search, action: 'search' },
   { href: '/settings', label: 'Settings', icon: Settings },
 ]
@@ -147,6 +125,17 @@ export default function Sidebar() {
 
         {/* Bottom section */}
         <div className="px-3 py-3 border-t border-[var(--color-glass-border)] space-y-2">
+          {/* Theme Toggle (Mobile/Tablet Only) */}
+          <div className="lg:hidden">
+            <ThemeToggle 
+              showText={sidebarOpen} 
+              className={cn(
+                'w-full', 
+                !sidebarOpen && 'justify-center !px-0'
+              )} 
+            />
+          </div>
+
           {/* User Logged In */}
           <Show when="signed-in">
             <div className={cn('sidebar-link', !sidebarOpen && 'justify-center', 'pointer-events-none')}>

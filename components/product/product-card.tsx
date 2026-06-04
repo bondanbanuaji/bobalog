@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { Product } from '@/types'
 import { useUIStore } from '@/store/ui.store'
 import ProductStatusBadge from './product-status-badge'
-import PriceDisplay from './price-display'
+
 import { cn, formatNumber } from '@/lib/utils'
 
 interface ProductCardProps {
@@ -92,14 +92,6 @@ export default function ProductCard({ product, className, style }: ProductCardPr
           </div>
 
           <div className="mt-auto space-y-3">
-            {/* Price */}
-            <PriceDisplay
-              price={product.price}
-              originalPrice={product.originalPrice}
-              discountPercent={product.discountPercent}
-              size="md"
-            />
-
             {/* Stats & Tags */}
             <div className="flex items-center justify-between border-t border-[var(--color-glass-border)] pt-3">
               <div className="flex gap-3 text-[11px] text-text-muted">

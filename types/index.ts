@@ -18,26 +18,11 @@ export enum ProductStatus {
   UNAVAILABLE = 'UNAVAILABLE',
 }
 
-export enum ScrapeStatus {
-  PENDING = 'PENDING',
-  PREVIEW = 'PREVIEW',
-  BASIC = 'BASIC',
-  FULL = 'FULL',
-  FAILED = 'FAILED',
-}
-
-export type PriceChange = 'dropped' | 'increased' | 'stable' | 'unknown'
 
 export type Theme = 'dark' | 'light'
 
 // ---- Core Models ----
 
-export interface PriceHistory {
-  id: string
-  productId: string
-  price: number
-  checkedAt: Date
-}
 
 export interface Tag {
   id: string
@@ -64,8 +49,6 @@ export interface Product {
   title: string
   thumbnail?: string
   gallery: string[]
-  price: number
-  originalPrice?: number
   discountPercent?: number
 
   // Shop Info
@@ -83,13 +66,6 @@ export interface Product {
   priority: Priority
   status: ProductStatus
 
-  // Scrape State
-  scrapeStatus: ScrapeStatus
-  lastScraped?: Date
-
-  // Price History
-  priceHistory: PriceHistory[]
-  priceChange?: PriceChange
 
   // Relations
   tags: ProductTag[]
@@ -134,11 +110,10 @@ export interface CollectionProduct {
 export interface ProductFilters {
   status?: ProductStatus
   priority?: Priority
-  scrapeStatus?: ScrapeStatus
   collectionId?: string
   tagId?: string
   search?: string
-  sortBy?: 'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'name'
+  sortBy?: 'newest' | 'oldest' | 'name'
 }
 
 export interface CreateCollectionInput {
