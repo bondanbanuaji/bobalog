@@ -35,8 +35,8 @@ export default function SettingsPage() {
               profileSectionItem: "border-b border-[var(--color-glass-border)]",
               profileSectionPrimaryButton: "text-boba hover:bg-boba/10",
               avatarImageActionsUpload: "text-boba",
-              formButtonPrimary: "bg-boba text-white hover:bg-boba-dark",
-              formButtonReset: "text-text-muted hover:bg-white/5",
+              formButtonPrimary: "bg-boba text-[color:var(--btn-primary-text)] hover:bg-boba-dark",
+              formButtonReset: "text-text-muted hover:bg-[var(--color-glass-bg-hover)]",
               formFieldLabel: "text-text-secondary",
               formFieldInput: "bg-[var(--color-bg-surface)] border-[var(--color-glass-border)] text-text-primary",
             }

@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { Product } from '@/types'
 import { useUIStore } from '@/store/ui.store'
 import ProductStatusBadge from './product-status-badge'
+import SpotlightCard from '@/components/reactbits/SpotlightCard'
 
 import { cn, formatNumber } from '@/lib/utils'
 
@@ -32,7 +33,7 @@ export default function ProductCard({ product, className, style }: ProductCardPr
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => setActiveProductId(product.id)}
     >
-      <div className="glass-card p-0 overflow-hidden h-full flex flex-col">
+      <SpotlightCard className="glass-card p-0 h-full flex flex-col rounded-2xl" spotlightColor="rgba(196, 168, 130, 0.15)">
         {/* Image Section */}
         <div className="relative aspect-square overflow-hidden bg-[var(--color-bg-elevated)]">
           <img
@@ -124,7 +125,7 @@ export default function ProductCard({ product, className, style }: ProductCardPr
             </div>
           </div>
         </div>
-      </div>
+      </SpotlightCard>
     </motion.div>
   )
 }

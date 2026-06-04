@@ -6,6 +6,9 @@ import { Package, Search, Filter, SlidersHorizontal } from 'lucide-react'
 import { useUIStore } from '@/store/ui.store'
 import ProductGrid from '@/components/product/product-grid'
 import { Priority, ProductStatus } from '@/types'
+import SplitText from '@/components/reactbits/SplitText'
+import BlurText from '@/components/reactbits/BlurText'
+import Magnet from '@/components/reactbits/Magnet'
 
 export default function ProductsPage() {
   const { products, setQuickAddModalOpen } = useUIStore()
@@ -30,19 +33,30 @@ export default function ProductsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-text-primary flex items-center gap-2">
-            <Package className="text-boba" /> Kelola Produk
-          </h1>
-          <p className="text-text-muted mt-1">
-            Lihat, cari, dan kelola semua barang incaranmu.
-          </p>
+          <div className="flex items-center gap-2">
+            <Package className="text-boba" size={28} />
+            <SplitText
+              text="Kelola Produk"
+              tag="h1"
+              className="text-2xl font-bold tracking-tight text-text-primary"
+              delay={0.04}
+              splitBy="chars"
+            />
+          </div>
+          <BlurText
+            text="Lihat, cari, dan kelola semua barang incaranmu."
+            className="text-text-muted mt-1"
+            delay={0.03}
+          />
         </div>
-        <button 
-          onClick={() => setQuickAddModalOpen(true)}
-          className="btn btn-primary text-white"
-        >
-          <Package size={16} /> Tambah Produk
-        </button>
+        <Magnet padding={30}>
+          <button 
+            onClick={() => setQuickAddModalOpen(true)}
+            className="btn btn-primary"
+          >
+            <Package size={16} /> Tambah Produk
+          </button>
+        </Magnet>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
@@ -53,7 +67,7 @@ export default function ProductsPage() {
             placeholder="Cari nama produk atau catatan..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 h-10 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm focus:outline-none focus:border-boba transition-colors"
+            className="w-full pl-9 pr-4 h-10 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary focus:outline-none focus:border-boba transition-colors placeholder:text-text-muted"
           />
         </div>
         
@@ -61,7 +75,7 @@ export default function ProductsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="h-10 px-3 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm focus:outline-none focus:border-boba appearance-none"
+            className="h-10 px-3 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary focus:outline-none focus:border-boba appearance-none [&>option]:bg-bg-surface [&>option]:text-text-primary"
           >
             <option value="ALL">Semua Status</option>
             <option value="ACTIVE">Aktif</option>
@@ -73,7 +87,7 @@ export default function ProductsPage() {
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value as any)}
-            className="h-10 px-3 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm focus:outline-none focus:border-boba appearance-none"
+            className="h-10 px-3 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary focus:outline-none focus:border-boba appearance-none [&>option]:bg-bg-surface [&>option]:text-text-primary"
           >
             <option value="ALL">Semua Prioritas</option>
             <option value="MUST_BUY">Wajib Beli</option>

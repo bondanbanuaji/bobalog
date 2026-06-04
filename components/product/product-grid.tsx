@@ -4,6 +4,7 @@ import { motion, type Variants } from 'framer-motion'
 import type { Product } from '@/types'
 import ProductCard from './product-card'
 import ProductSkeleton from './product-skeleton'
+import AnimatedList from '@/components/reactbits/AnimatedList'
 import { ShoppingBag } from 'lucide-react'
 
 interface ProductGridProps {
@@ -51,17 +52,10 @@ export default function ProductGrid({
   }
 
   return (
-    <motion.div 
-      variants={container}
-      initial="hidden"
-      animate="show"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4"
-    >
+    <AnimatedList className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
       {products.map((product) => (
-        <motion.div key={product.id} variants={item}>
-          <ProductCard product={product} />
-        </motion.div>
+        <ProductCard key={product.id} product={product} />
       ))}
-    </motion.div>
+    </AnimatedList>
   )
 }

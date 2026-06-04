@@ -23,6 +23,12 @@
   --glass-bg-hover: rgba(0, 0, 0, 0.04);
   --glass-border: rgba(0, 0, 0, 0.08);
   --glass-border-hover: rgba(0, 0, 0, 0.15);
+
+  /* Button text colors */
+  --btn-primary-text: #0a0a0f;
+  --btn-danger-text: #ffffff;
+  --btn-success-text: #052e16;
+  --btn-accent-text: #ffffff;
 }
 
 [data-theme=dark] {
@@ -41,6 +47,12 @@
   --glass-bg-hover: rgba(255, 255, 255, 0.06);
   --glass-border: rgba(255, 255, 255, 0.07);
   --glass-border-hover: rgba(255, 255, 255, 0.14);
+
+  /* Button text colors */
+  --btn-primary-text: #ffffff;
+  --btn-danger-text: #ffffff;
+  --btn-success-text: #ffffff;
+  --btn-accent-text: #ffffff;
 }
 
 /* ---- Theme Tokens (Shared) ---- */
@@ -318,6 +330,22 @@ html.light .noise-overlay::before {
   100% { background-position: -200% 0; }
 }
 
+/* ---- React Bits Component Animations ---- */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes shiny-text {
+  0% { background-position: 100% 50%; }
+  100% { background-position: -100% 50%; }
+}
+
+.animate-shiny-text {
+  animation: shiny-text var(--shiny-speed, 5s) linear infinite;
+}
+
 /* ---- Animations ---- */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(8px); }
@@ -414,7 +442,7 @@ html.light .noise-overlay::before {
 /* Primary Button (Boba) */
 .btn-primary {
   background: linear-gradient(135deg, var(--color-boba-light) 0%, var(--color-boba-dark) 100%);
-  color: #0a0a0f;
+  color: var(--btn-primary-text);
   box-shadow: 0 4px 15px rgba(196, 168, 130, 0.2);
 }
 .btn-primary:hover {
@@ -430,7 +458,7 @@ html.light .noise-overlay::before {
 /* Danger Button (Red/Strawberry) */
 .btn-danger {
   background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
-  color: white;
+  color: var(--btn-danger-text);
   box-shadow: 0 4px 15px rgba(255, 117, 140, 0.2);
 }
 .btn-danger:hover {
@@ -445,7 +473,7 @@ html.light .noise-overlay::before {
 /* Success Button (Matcha) */
 .btn-success {
   background: linear-gradient(135deg, var(--color-matcha-light) 0%, #4ade80 100%);
-  color: #052e16;
+  color: var(--btn-success-text);
   box-shadow: 0 4px 15px rgba(123, 207, 160, 0.2);
 }
 .btn-success:hover {
@@ -460,7 +488,7 @@ html.light .noise-overlay::before {
 /* Accent Button (Taro) */
 .btn-accent {
   background: linear-gradient(135deg, var(--color-taro-light) 0%, var(--color-taro) 100%);
-  color: white;
+  color: var(--btn-accent-text);
   box-shadow: 0 4px 15px rgba(155, 127, 232, 0.2);
 }
 .btn-accent:hover {

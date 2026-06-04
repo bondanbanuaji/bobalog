@@ -297,7 +297,7 @@ export default function ProductModal() {
                         <select 
                           value={editPriority}
                           onChange={(e) => setEditPriority(e.target.value as Priority)}
-                          className="w-full h-9 rounded-lg bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm px-3 outline-none focus:border-boba"
+                          className="w-full h-9 rounded-lg bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary px-3 outline-none focus:border-boba [&>option]:bg-bg-surface [&>option]:text-text-primary"
                         >
                           <option value="LOW">Low</option>
                           <option value="NORMAL">Normal</option>
@@ -310,7 +310,7 @@ export default function ProductModal() {
                         <select 
                           value={editStatus}
                           onChange={(e) => setEditStatus(e.target.value as ProductStatus)}
-                          className="w-full h-9 rounded-lg bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm px-3 outline-none focus:border-boba"
+                          className="w-full h-9 rounded-lg bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary px-3 outline-none focus:border-boba [&>option]:bg-bg-surface [&>option]:text-text-primary"
                         >
                           <option value="ACTIVE">Active</option>
                           <option value="BOUGHT">Bought</option>

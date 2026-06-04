@@ -125,24 +125,21 @@ export default function QuickAddModal() {
 
           {/* Modal — putih solid di light, hitam solid di dark */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: 12 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: 8 }}
-            transition={{ type: 'spring', stiffness: 340, damping: 28 }}
-            className="relative w-full max-w-md overflow-hidden rounded-2xl shadow-2xl
-              bg-white dark:bg-black
-              border border-black/8 dark:border-white/10"
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="relative w-full max-w-lg mx-4 rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden
+              bg-bg-surface border border-[var(--color-glass-border)]"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4
-              border-b border-black/8 dark:border-white/10">
+            <div className="flex items-center justify-between px-5 sm:px-6 py-4 sm:py-5 border-b border-[var(--color-glass-border)]">
               <div className="flex items-center gap-2.5">
                 <div className="flex items-center justify-center w-7 h-7 rounded-lg
                   bg-boba/10 dark:bg-boba/20">
                   <Package size={14} className="text-boba" />
                 </div>
                 <h2 className="text-base font-semibold tracking-tight
-                  text-black dark:text-white">
+                  text-text-primary">
                   Tambahkan Produk
                 </h2>
                 <span className="text-[10px] font-medium px-2 py-0.5 rounded-full
@@ -152,10 +149,9 @@ export default function QuickAddModal() {
               </div>
               <button
                 onClick={closeModal}
-                className="p-1.5 rounded-lg transition-all duration-150
-                  text-black/40 dark:text-white/40
-                  hover:text-black dark:hover:text-white
-                  hover:bg-black/6 dark:hover:bg-white/8"
+                className="p-2 rounded-xl transition-colors duration-200
+                  text-text-muted hover:text-text-primary
+                  hover:bg-[var(--color-glass-bg-hover)]"
               >
                 <X size={16} />
               </button>
@@ -178,7 +174,7 @@ export default function QuickAddModal() {
                   ) : (
                     <Info size={15} className="text-boba flex-shrink-0 mt-0.5" />
                   )}
-                  <p className="text-xs leading-relaxed text-black/60 dark:text-white/60">
+                  <p className="text-xs leading-relaxed text-text-muted">
                     {isLoadingMeta ? (
                       'Mendeteksi data produk secara otomatis...'
                     ) : (
@@ -192,12 +188,12 @@ export default function QuickAddModal() {
                 {/* URL Input */}
                 <motion.div custom={1} variants={fieldVariants} initial="hidden" animate="visible" className="space-y-1.5">
                   <label className="text-[11px] font-medium uppercase tracking-wider ml-0.5
-                    text-black/40 dark:text-white/40">
+                    text-text-muted">
                     URL Shopee
                   </label>
                   <div className="relative group">
                     <Link2 size={13} className="absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-150
-                      text-black/30 dark:text-white/30
+                      text-text-muted
                       group-focus-within:text-boba" />
                     <input
                       type="text"
@@ -205,16 +201,14 @@ export default function QuickAddModal() {
                       onChange={(e) => setUrlInput(e.target.value)}
                       placeholder="https://shopee.co.id/..."
                       className="w-full pl-9 pr-3.5 h-10 rounded-xl text-sm outline-none transition-all duration-150
-                        bg-black/4 dark:bg-white/6
-                        border border-black/10 dark:border-white/10
-                        text-black dark:text-white
-                        placeholder:text-black/30 dark:placeholder:text-white/30
-                        focus:border-boba/50 focus:ring-2 focus:ring-boba/15"
+                        bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)]
+                        text-text-primary placeholder:text-text-muted
+                        focus:border-boba focus:ring-2 focus:ring-boba/15"
                     />
                   </div>
                   {productId && (
                     <p className="text-[10px] ml-1 font-mono
-                      text-black/40 dark:text-white/40">
+                      text-text-muted">
                       ID: <span className="text-boba">{productId}</span>
                     </p>
                   )}
@@ -223,7 +217,7 @@ export default function QuickAddModal() {
                 {/* Title Input */}
                 <motion.div custom={2} variants={fieldVariants} initial="hidden" animate="visible" className="space-y-1.5">
                   <label className="text-[11px] font-medium uppercase tracking-wider ml-0.5
-                    text-black/40 dark:text-white/40">
+                    text-text-muted">
                     Nama Produk <span className="text-red-500 dark:text-red-400 normal-case">*</span>
                   </label>
                   <div className="flex gap-2">
@@ -241,11 +235,9 @@ export default function QuickAddModal() {
                       placeholder="Copas dari Shopee..."
                       autoFocus
                       className="w-full px-3.5 h-10 rounded-xl text-sm outline-none transition-all duration-150
-                        bg-black/4 dark:bg-white/6
-                        border border-black/10 dark:border-white/10
-                        text-black dark:text-white
-                        placeholder:text-black/30 dark:placeholder:text-white/30
-                        focus:border-boba/50 focus:ring-2 focus:ring-boba/15"
+                        bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)]
+                        text-text-primary placeholder:text-text-muted
+                        focus:border-boba focus:ring-2 focus:ring-boba/15"
                     />
                   </div>
                 </motion.div>
@@ -253,9 +245,9 @@ export default function QuickAddModal() {
                 {/* Notes */}
                 <motion.div custom={4} variants={fieldVariants} initial="hidden" animate="visible" className="space-y-1.5">
                   <label className="text-[11px] font-medium uppercase tracking-wider ml-0.5
-                    text-black/40 dark:text-white/40">
+                    text-text-muted">
                     Catatan{' '}
-                    <span className="normal-case font-normal text-black/30 dark:text-white/30">
+                    <span className="normal-case font-normal text-text-muted">
                       — opsional
                     </span>
                   </label>
@@ -264,19 +256,17 @@ export default function QuickAddModal() {
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Alasan beli, tunggu gajian, dll..."
                     className="w-full px-3.5 py-2.5 h-[76px] rounded-xl text-sm outline-none resize-none transition-all duration-150
-                      bg-black/4 dark:bg-white/6
-                      border border-black/10 dark:border-white/10
-                      text-black dark:text-white
-                      placeholder:text-black/30 dark:placeholder:text-white/30
-                      focus:border-boba/50 focus:ring-2 focus:ring-boba/15"
+                      bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)]
+                      text-text-primary placeholder:text-text-muted
+                      focus:border-boba focus:ring-2 focus:ring-boba/15"
                   />
                 </motion.div>
               </div>
 
               {/* Footer */}
               <div className="flex items-center justify-end gap-2.5 px-5 py-3.5
-                border-t border-black/8 dark:border-white/10
-                bg-black/2 dark:bg-white/3">
+                border-t border-[var(--color-glass-border)]
+                bg-[var(--color-glass-bg)]">
                 <button
                   type="button"
                   onClick={closeModal}
