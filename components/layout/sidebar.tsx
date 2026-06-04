@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Show, UserButton, SignInButton, SignUpButton } from '@clerk/nextjs'
@@ -23,7 +24,12 @@ const navItems = [
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const { sidebarOpen, toggleSidebar, setSearchOpen, collections } = useUIStore()
+  const { sidebarOpen, setSidebarOpen, toggleSidebar, setSearchOpen, collections } = useUIStore()
+
+  useEffect(() => {
+    // Tutup sidebar setiap kali pathname (halaman) berubah
+    setSidebarOpen(false)
+  }, [pathname, setSidebarOpen])
 
   return (
     <>

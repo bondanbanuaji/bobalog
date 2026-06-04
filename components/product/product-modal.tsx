@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ExternalLink, Archive, MoreVertical, Store, Star, Box, ChevronLeft, Edit2, Trash2, Check, Loader2 } from 'lucide-react'
+import { X, ExternalLink, Archive, MoreVertical, Store, Star, Box, ChevronLeft, Edit2, Trash2, Check, Loader2, Link as LinkIcon, Share2 } from 'lucide-react'
 import { useUIStore } from '@/store/ui.store'
 import { updateProduct, deleteProduct, toggleArchive } from '@/actions/product.actions'
 import { toast } from 'sonner'
@@ -115,6 +115,35 @@ export default function ProductModal() {
     }
   }
 
+  const handleCopyLink = async () => {
+    if (product.shopeeUrl) {
+      try {
+        await navigator.clipboard.writeText(product.shopeeUrl)
+        toast.success('Link Shopee berhasil disalin')
+      } catch (e) {
+        toast.error('Gagal menyalin link')
+      }
+    }
+  }
+
+  const handleShare = async () => {
+    if (navigator.share && product.shopeeUrl) {
+      try {
+        await navigator.share({
+          title: product.title,
+          text: `Coba cek barang ini: ${product.title}`,
+          url: product.shopeeUrl
+        })
+      } catch (e) {
+        if ((e as Error).name !== 'AbortError') {
+          toast.error('Gagal membagikan')
+        }
+      }
+    } else {
+      handleCopyLink()
+    }
+  }
+
   return (
     <AnimatePresence>
       {activeProductId && (
@@ -137,25 +166,26 @@ export default function ProductModal() {
             className="fixed top-0 right-0 bottom-0 z-50 w-full max-w-xl bg-bg-base border-l border-[var(--color-glass-border)] shadow-2xl flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-4 h-16 border-b border-[var(--color-glass-border)] bg-bg-surface/50 backdrop-blur-md">
+            <div className="relative z-10 flex items-center justify-between px-3 sm:px-4 h-14 sm:h-16 border-b border-[var(--color-glass-border)] bg-bg-surface/50 backdrop-blur-md">
               <button
                 onClick={() => setActiveProductId(null)}
-                className="flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary transition-colors"
+                className="flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary transition-colors flex-shrink-0"
               >
                 <ChevronLeft size={16} />
-                Kembali
+                <span className="hidden xs:inline">Kembali</span>
               </button>
               
-              <div className="flex items-center gap-2 relative">
+              <div className="flex items-center gap-1.5 sm:gap-2 relative">
                 {product.shopeeUrl && (
                   <a
                     href={product.shopeeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn btn-primary h-8 px-3 rounded-lg text-xs"
+                    className="btn btn-primary h-8 px-2 sm:px-3 rounded-lg text-xs"
+                    title="Buka Shopee"
                   >
-                    <span>Buka Shopee</span>
-                    <ExternalLink size={12} />
+                    <span className="hidden sm:inline">Buka Shopee</span>
+                    <ExternalLink size={14} className={cn("sm:ml-1")} />
                   </a>
                 )}
                 
@@ -163,33 +193,35 @@ export default function ProductModal() {
                   <button 
                     onClick={handleSave}
                     disabled={isSubmitting}
-                    className="btn btn-success h-8 px-3 rounded-lg text-xs"
+                    className="btn btn-success h-8 px-2 sm:px-3 rounded-lg text-xs"
                   >
-                    {isSubmitting ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
-                    <span>Simpan</span>
+                    {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                    <span className="hidden sm:inline sm:ml-1">Simpan</span>
                   </button>
                 ) : (
                   <>
                     <button 
                       onClick={() => setIsEditing(true)}
-                      className="btn btn-glass h-8 px-3 rounded-lg text-xs text-text-muted"
+                      className="btn btn-glass h-8 px-2 sm:px-3 rounded-lg text-xs text-text-muted"
+                      title="Edit"
                     >
-                      <Edit2 size={12} />
-                      <span>Edit</span>
+                      <Edit2 size={14} />
+                      <span className="hidden sm:inline sm:ml-1">Edit</span>
                     </button>
                     
                     <button 
                       onClick={() => setIsDeleting(true)}
-                      className="btn btn-danger h-8 px-3 rounded-lg text-xs"
+                      className="btn btn-danger h-8 px-2 sm:px-3 rounded-lg text-xs"
+                      title="Hapus"
                     >
-                      <Trash2 size={12} />
-                      <span>Hapus</span>
+                      <Trash2 size={14} />
+                      <span className="hidden sm:inline sm:ml-1">Hapus</span>
                     </button>
 
                     <div className="relative" ref={menuRef}>
                       <button 
                         onClick={() => setShowMenu(!showMenu)}
-                        className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors"
+                        className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors shrink-0"
                       >
                         <MoreVertical size={16} />
                       </button>
@@ -200,14 +232,39 @@ export default function ProductModal() {
                             initial={{ opacity: 0, scale: 0.95, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                            className="absolute right-0 top-full mt-2 w-48 bg-bg-surface border border-[var(--color-glass-border)] rounded-xl shadow-xl overflow-hidden py-1 z-50"
+                            className="absolute right-0 top-full mt-2 w-48 bg-bg-surface border border-[var(--color-glass-border)] rounded-xl shadow-xl overflow-hidden py-1 z-50 flex flex-col"
                           >
+                            {product.shopeeUrl && (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    handleCopyLink()
+                                    setShowMenu(false)
+                                  }}
+                                  className="w-full px-4 py-2.5 text-left text-sm text-text-secondary hover:bg-[var(--color-glass-bg-hover)] hover:text-text-primary flex items-center gap-3 transition-colors"
+                                >
+                                  <LinkIcon size={14} />
+                                  Salin Link
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    handleShare()
+                                    setShowMenu(false)
+                                  }}
+                                  className="w-full px-4 py-2.5 text-left text-sm text-text-secondary hover:bg-[var(--color-glass-bg-hover)] hover:text-text-primary flex items-center gap-3 transition-colors"
+                                >
+                                  <Share2 size={14} />
+                                  Bagikan
+                                </button>
+                                <div className="h-px bg-[var(--color-glass-border)] my-1 w-full" />
+                              </>
+                            )}
                             <button
                               onClick={() => {
                                 handleToggleArchive()
                                 setShowMenu(false)
                               }}
-                              className="w-full px-4 py-2 text-left text-sm text-text-secondary hover:bg-[var(--color-glass-bg-hover)] hover:text-text-primary flex items-center gap-2"
+                              className="w-full px-4 py-2.5 text-left text-sm text-text-secondary hover:bg-[var(--color-glass-bg-hover)] hover:text-text-primary flex items-center gap-3 transition-colors"
                             >
                               <Archive size={14} />
                               {product.status === ProductStatus.ARCHIVED ? 'Batal Arsipkan' : 'Arsipkan'}
@@ -248,7 +305,7 @@ export default function ProductModal() {
               )}
 
               {/* Image Hero */}
-              <div className="relative aspect-square bg-black">
+              <div className="relative aspect-video sm:aspect-square bg-black">
                 <img
                   src={imageUrl}
                   alt={product.title}
@@ -260,17 +317,17 @@ export default function ProductModal() {
                 </div>
               </div>
 
-              <div className="p-6 space-y-8">
+              <div className="p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
                 {/* Title & Price */}
                 <div className="space-y-4">
                   {isEditing ? (
                     <textarea 
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
-                      className="w-full text-xl font-medium leading-snug bg-transparent border-b border-[var(--color-glass-border)] focus:border-boba outline-none resize-none overflow-hidden min-h-[60px]"
+                      className="w-full text-lg sm:text-xl font-medium leading-snug bg-transparent border-b border-[var(--color-glass-border)] focus:border-boba outline-none resize-none overflow-hidden min-h-[60px]"
                     />
                   ) : (
-                    <h2 className="text-xl font-medium leading-snug">{product.title}</h2>
+                    <h2 className="text-lg sm:text-xl font-medium leading-snug">{product.title}</h2>
                   )}
                   
                   <div className="flex items-center gap-4 text-sm text-text-secondary">
