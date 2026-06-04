@@ -59,21 +59,24 @@ export default function ProductModal() {
               </button>
               
               <div className="flex items-center gap-2">
-                <a
-                  href={product.shopeeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary px-3 py-1.5 text-xs rounded-lg"
-                >
-                  Buka Shopee <ExternalLink size={12} className="ml-1" />
-                </a>
-                <button className="p-1.5 rounded-lg hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors">
-                  <Archive size={16} />
-                </button>
-                <button className="p-1.5 rounded-lg hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors">
-                  <MoreVertical size={16} />
-                </button>
-              </div>
+  <a
+    href={product.shopeeUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="btn-primary h-8 px-3 rounded-lg text-xs inline-flex items-center justify-center gap-1"
+  >
+    <span>Buka Shopee</span>
+    <ExternalLink size={12} />
+  </a>
+
+  <button className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors">
+    <Archive size={16} />
+  </button>
+
+  <button className="h-8 w-8 flex items-center justify-center rounded-lg hover:bg-[var(--color-glass-bg-hover)] text-text-muted transition-colors">
+    <MoreVertical size={16} />
+  </button>
+</div>
             </div>
 
             {/* Content Scroll Area */}

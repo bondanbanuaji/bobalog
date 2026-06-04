@@ -11,14 +11,16 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Format number as Indonesian Rupiah
  */
-export function formatPrice(price: number): string {
+export function formatPrice(price: number | null | undefined): string {
+  if (price === null || price === undefined || isNaN(price)) return '0'
   return new Intl.NumberFormat('id-ID').format(price)
 }
 
 /**
  * Format large numbers compactly (e.g., 1200 → "1.2k")
  */
-export function formatNumber(num: number): string {
+export function formatNumber(num: number | null | undefined): string {
+  if (num === null || num === undefined || isNaN(num)) return '0'
   if (num >= 1_000_000) {
     return `${(num / 1_000_000).toFixed(1)}M`
   }
