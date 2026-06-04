@@ -21,7 +21,7 @@ export default function Navbar() {
         </button>
 
         {/* Smart Paste Bar — scales across breakpoints */}
-        <div className="flex-1 min-w-0 max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl">
+        <div className="flex-1 min-w-0 max-w-sm sm:max-w-md md:max-w-lg lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl w-full">
           <SmartPasteBar />
         </div>
 

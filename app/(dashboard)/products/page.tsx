@@ -59,23 +59,23 @@ export default function ProductsPage() {
         </Magnet>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="flex flex-col md:flex-row gap-3">
+        <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
           <input
             type="text"
             placeholder="Cari nama produk atau catatan..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 h-10 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary focus:outline-none focus:border-boba transition-colors placeholder:text-text-muted"
+            className="w-full pl-9 pr-4 h-11 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary focus:outline-none focus:border-boba transition-colors placeholder:text-text-muted"
           />
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex flex-col xs:flex-row sm:flex-row gap-2 shrink-0">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="h-10 px-3 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary focus:outline-none focus:border-boba appearance-none [&>option]:bg-bg-surface [&>option]:text-text-primary"
+            className="w-full sm:w-auto h-11 px-3 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary focus:outline-none focus:border-boba appearance-none [&>option]:bg-bg-surface [&>option]:text-text-primary"
           >
             <option value="ALL">Semua Status</option>
             <option value="ACTIVE">Aktif</option>
@@ -87,7 +87,7 @@ export default function ProductsPage() {
           <select
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value as any)}
-            className="h-10 px-3 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary focus:outline-none focus:border-boba appearance-none [&>option]:bg-bg-surface [&>option]:text-text-primary"
+            className="w-full sm:w-auto h-11 px-3 rounded-xl bg-[var(--color-glass-bg)] border border-[var(--color-glass-border)] text-sm text-text-primary focus:outline-none focus:border-boba appearance-none [&>option]:bg-bg-surface [&>option]:text-text-primary"
           >
             <option value="ALL">Semua Prioritas</option>
             <option value="MUST_BUY">Wajib Beli</option>

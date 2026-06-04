@@ -78,10 +78,10 @@ export default function ProductCard({ product, className, style }: ProductCardPr
         </div>
 
         {/* Content Section */}
-        <div className="p-4 flex flex-col flex-1 gap-3">
+        <div className="p-3 sm:p-4 lg:p-5 flex flex-col flex-1 gap-2 sm:gap-3">
           {/* Title & Shop */}
           <div className="space-y-1.5">
-            <h3 className="font-medium text-text-primary text-sm line-clamp-2 leading-snug group-hover:text-boba transition-colors">
+            <h3 className="font-medium text-text-primary text-xs sm:text-sm 2xl:text-base line-clamp-2 leading-snug group-hover:text-boba transition-colors">
               {product.title}
             </h3>
             {product.shopName && (
